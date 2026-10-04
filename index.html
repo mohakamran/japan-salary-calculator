@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Japan Take-Home Pay Calculator</title>
+  <meta name="description" content="Estimate your take-home salary in Japan: income tax, resident tax, health insurance, pension, employment insurance, living costs and savings.">
+  <meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14161b" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23c9452e'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E5%86%86%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#results" data-i18n="res.takeHome">Estimated take-home pay</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="seal" aria-hidden="true">円</span>
+        <div>
+          <h1 data-i18n="app.title">Japan Take-Home Pay Calculator</h1>
+          <p class="tagline" data-i18n="app.tagline">Estimate your take-home salary, taxes, social insurance and savings in Japan.</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <span class="rates-badge" id="rates-badge"></span>
+        <div class="segmented segmented--small" role="group" data-i18n-aria="lang.label" aria-label="Language">
+          <button type="button" class="seg-btn" data-lang="en" lang="en">EN</button>
+          <button type="button" class="seg-btn" data-lang="ja" lang="ja">日本語</button>
+        </div>
+        <button type="button" class="icon-btn" id="theme-toggle" data-i18n-aria="theme.toggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <p class="disclaimer-banner" role="note">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v6M12 16.5v.01"/></svg>
+      <span data-i18n="disclaimer.short">Estimates only — not tax advice.</span>
+    </p>
+  </div>
+
+  <main class="container layout">
+    <!-- ============================ INPUTS ============================ -->
+    <form class="panel inputs" id="calc-form" novalidate autocomplete="off">
+      <section class="field-group">
+        <h2 class="panel-title" data-i18n="input.heading">Your salary</h2>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="salary" data-i18n="input.salary">Gross salary</label>
+            <div class="segmented" role="radiogroup" data-i18n-aria="input.period" aria-label="Salary period">
+              <label class="seg-btn"><input type="radio" name="period" value="annual" checked><span data-i18n="period.annual">Annual</span></label>
+              <label class="seg-btn"><input type="radio" name="period" value="monthly"><span data-i18n="period.monthly">Monthly</span></label>
+            </div>
+          </div>
+          <div class="money-input">
+            <span class="currency" aria-hidden="true">¥</span>
+            <input id="salary" name="salary" type="text" inputmode="decimal" aria-describedby="salary-hint salary-error" spellcheck="false">
+          </div>
+          <p class="hint" id="salary-hint"></p>
+          <p class="error" id="salary-error" role="alert"></p>
+        </div>
+
+        <div class="quick-picks" role="group" data-i18n-aria="input.quick" aria-label="Quick picks">
+          <span class="quick-label" data-i18n="input.quick">Quick picks (annual)</span>
+          <button type="button" class="chip" data-amount="3000000">¥3M</button>
+          <button type="button" class="chip" data-amount="4000000">¥4M</button>
+          <button type="button" class="chip" data-amount="5000000">¥5M</button>
+          <button type="button" class="chip" data-amount="6000000">¥6M</button>
+          <button type="button" class="chip" data-amount="8000000">¥8M</button>
+          <button type="button" class="chip" data-amount="10000000">¥10M</button>
+          <button type="button" class="chip" data-amount="15000000">¥15M</button>
+        </div>
+
+        <div class="field">
+          <label for="bonus"><span data-i18n="input.bonus">Annual bonus</span> <span class="optional" data-i18n="input.optional">optional</span></label>
+          <div class="money-input">
+            <span class="currency" aria-hidden="true">¥</span>
+            <input id="bonus" name="bonus" type="text" inputmode="decimal" aria-describedby="bonus-hint bonus-error" spellcheck="false" placeholder="0">
+          </div>
+          <p class="hint" id="bonus-hint"></p>
+          <p class="error" id="bonus-error" role="alert"></p>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <h2 class="panel-title" data-i18n="input.personal">Personal details</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="age" data-i18n="input.age">Age</label>
+            <input id="age" name="age" type="number" inputmode="numeric" min="15" max="99" step="1" aria-describedby="age-hint age-error">
+            <p class="error" id="age-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="prefecture" data-i18n="input.prefecture">Health insurance</label>
+            <select id="prefecture" name="prefecture" aria-describedby="prefecture-hint"></select>
+          </div>
+        </div>
+        <p class="hint" id="age-hint" data-i18n="input.age.hint"></p>
+        <p class="hint" id="prefecture-hint" data-i18n="input.prefecture.hint"></p>
+
+        <div class="field" id="custom-rate-field" hidden>
+          <label for="customRate" data-i18n="input.customRate">Health insurance rate (total, %)</label>
+          <div class="money-input money-input--suffix">
+            <input id="customRate" name="customRate" type="text" inputmode="decimal" aria-describedby="customRate-hint customRate-error" placeholder="9.5">
+            <span class="currency" aria-hidden="true">%</span>
+          </div>
+          <p class="hint" id="customRate-hint" data-i18n="input.customRate.hint"></p>
+          <p class="error" id="customRate-error" role="alert"></p>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="spouse" name="spouse" aria-describedby="spouse-hint">
+          <span><span data-i18n="input.spouse">Dependent spouse</span><small class="hint" id="spouse-hint" data-i18n="input.spouse.hint"></small></span>
+        </label>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="depGeneral" data-i18n="input.depGeneral">Dependents aged 16–18 / 23+</label>
+            <input id="depGeneral" name="depGeneral" type="number" inputmode="numeric" min="0" max="10" step="1" aria-describedby="dep-hint depGeneral-error">
+            <p class="error" id="depGeneral-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="depSpecific" data-i18n="input.depSpecific">Dependents aged 19–22</label>
+            <input id="depSpecific" name="depSpecific" type="number" inputmode="numeric" min="0" max="10" step="1" aria-describedby="dep-hint depSpecific-error">
+            <p class="error" id="depSpecific-error" role="alert"></p>
+          </div>
+        </div>
+        <p class="hint" id="dep-hint" data-i18n="input.dep.hint"></p>
+
+        <div class="field">
+          <label for="other"><span data-i18n="input.other">Other deductions (annual)</span> <span class="optional" data-i18n="input.optional">optional</span></label>
+          <div class="money-input">
+            <span class="currency" aria-hidden="true">¥</span>
+            <input id="other" name="other" type="text" inputmode="decimal" aria-describedby="other-hint other-error" placeholder="0">
+          </div>
+          <p class="hint" id="other-hint" data-i18n="input.other.hint"></p>
+          <p class="error" id="other-error" role="alert"></p>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="resident" name="resident" checked aria-describedby="resident-hint">
+          <span><span data-i18n="input.resident">Include resident tax</span><small class="hint" id="resident-hint" data-i18n="input.resident.hint"></small></span>
+        </label>
+      </section>
+
+      <section class="field-group advanced">
+        <button type="button" class="advanced-toggle" id="advanced-toggle" aria-expanded="false" aria-controls="advanced-body">
+          <span>
+            <span class="panel-title" data-i18n="adv.heading">Advanced: living costs</span>
+            <small class="hint" data-i18n="adv.sub">Enter monthly expenses to estimate savings.</small>
+          </span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="collapsible" id="advanced-body">
+          <div class="collapsible-inner">
+            <div class="field">
+              <label for="preset" data-i18n="adv.preset">Start from an estimate</label>
+              <select id="preset" name="preset"></select>
+            </div>
+            <p class="status-note" id="expense-status" aria-live="polite"></p>
+            <div class="expense-grid" id="expense-fields"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" id="reset-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></svg>
+          <span data-i18n="btn.reset">Reset all</span>
+        </button>
+        <span class="sr-status" id="form-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <!-- ============================ RESULTS ============================ -->
+    <section class="results" id="results" aria-live="polite" aria-atomic="false" tabindex="-1">
+      <p class="error-banner" id="error-banner" hidden data-i18n="err.fix">Fix the highlighted field to update results.</p>
+
+      <div class="results-toolbar">
+        <span class="toolbar-label" data-i18n="res.view">Show amounts</span>
+        <div class="segmented" role="radiogroup" data-i18n-aria="res.view" aria-label="Show amounts">
+          <label class="seg-btn"><input type="radio" name="view" value="monthly" checked><span data-i18n="res.perMonth">per month</span></label>
+          <label class="seg-btn"><input type="radio" name="view" value="annual"><span data-i18n="res.perYear">per year</span></label>
+        </div>
+      </div>
+
+      <article class="hero card">
+        <div>
+          <p class="hero-label" data-i18n="res.takeHome">Estimated take-home pay</p>
+          <p class="hero-amount"><span id="hero-net">—</span><span class="hero-period" id="hero-period"></span></p>
+          <p class="hero-sub" id="hero-sub"></p>
+        </div>
+        <div class="hero-side">
+          <p class="hero-side-label" data-i18n="res.effective">Effective deduction rate</p>
+          <p class="hero-side-value" id="hero-rate">—</p>
+        </div>
+      </article>
+
+      <div class="stats">
+        <article class="stat card">
+          <p class="stat-label" data-i18n="res.gross">Gross salary</p>
+          <p class="stat-value" id="stat-gross">—</p>
+          <p class="stat-sub">100%</p>
+        </article>
+        <article class="stat card stat--tax">
+          <p class="stat-label"><span class="swatch swatch--tax" aria-hidden="true"></span><span data-i18n="res.taxes">Taxes</span></p>
+          <p class="stat-value" id="stat-tax">—</p>
+          <p class="stat-sub" id="stat-tax-sub"></p>
+        </article>
+        <article class="stat card stat--si">
+          <p class="stat-label"><span class="swatch swatch--si" aria-hidden="true"></span><span data-i18n="res.social">Social insurance</span></p>
+          <p class="stat-value" id="stat-si">—</p>
+          <p class="stat-sub" id="stat-si-sub"></p>
+        </article>
+        <article class="stat card stat--save">
+          <p class="stat-label"><span class="swatch swatch--save" aria-hidden="true"></span><span data-i18n="res.savings">Estimated savings</span> <span class="badge" id="savings-badge"></span></p>
+          <p class="stat-value" id="stat-save">—</p>
+          <p class="stat-sub" id="stat-save-sub"></p>
+        </article>
+      </div>
+      <p class="fine-print" id="avg-note" hidden data-i18n="res.monthlyAvgNote"></p>
+
+      <article class="card">
+        <header class="card-head">
+          <h2 data-i18n="flow.heading">Where your salary goes</h2>
+          <p data-i18n="flow.sub"></p>
+        </header>
+        <div id="flow-chart" class="flow"></div>
+      </article>
+
+      <article class="card">
+        <header class="card-head">
+          <h2 data-i18n="table.heading">Detailed breakdown</h2>
+          <p data-i18n="table.sub"></p>
+        </header>
+        <div class="table-wrap">
+          <table class="breakdown" id="breakdown-table"></table>
+        </div>
+        <p class="fine-print" data-i18n="table.rounding"></p>
+      </article>
+
+      <article class="card">
+        <header class="card-head card-head--row">
+          <div>
+            <h2 data-i18n="budget.heading">Monthly budget</h2>
+            <p data-i18n="budget.sub"></p>
+          </div>
+          <span class="badge" id="budget-badge"></span>
+        </header>
+        <div class="budget">
+          <dl class="budget-list" id="budget-list"></dl>
+          <div>
+            <h3 class="sub-heading" data-i18n="budget.expenseBreakdown">Expense breakdown</h3>
+            <div id="expense-chart" class="bar-list"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <header class="card-head">
+          <h2 data-i18n="curve.heading">How deductions scale with salary</h2>
+          <p data-i18n="curve.sub"></p>
+        </header>
+        <div id="curve-chart" class="curve"></div>
+      </article>
+
+      <details class="card details-card">
+        <summary>
+          <span><span class="details-title" data-i18n="calc.heading">How this was calculated</span><small class="hint" data-i18n="calc.sub"></small></span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </summary>
+        <div class="calc-grid" id="calc-details"></div>
+      </details>
+
+      <article class="card notes-card">
+        <h2 data-i18n="notes.heading">Assumptions &amp; limitations</h2>
+        <ul class="notes" id="notes-list"></ul>
+        <p class="sources"><strong data-i18n="sources">Sources</strong>: <span id="sources-list"></span></p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p data-i18n="footer.disclaimer"></p>
+      <p class="footer-meta" id="footer-updated"></p>
+    </div>
+  </footer>
+
+  <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
